@@ -1,0 +1,31 @@
+name: Job Scraper
+
+on:
+  schedule:
+    - cron: '0 11 * * *'   # 5 AM CST
+    - cron: '0 23 * * *'   # 5 PM CST
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install anthropic requests
+
+      - name: Run job scraper
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
+          NOTION_TOKEN:      ${{ secrets.NOTION_TOKEN }}
+          JOB_DB_ID:         ${{ secrets.JOB_DB_ID }}
+          JSEARCH_API_KEY:   ${{ secrets.JSEARCH_API_KEY }}
+        run: python scrape_jobs.py
